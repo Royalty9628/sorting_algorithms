@@ -1,71 +1,79 @@
 #include "sort.h"
-#include <sys/types.h>
 
 /**
- * partition - divides the array and swap datas
- * @array: array to be sorted
- * @low: first index
- * @high: last index
- * @size: array's size
- * Return: nothing
+ * swap_bubble - function to swap/sort.
+ *@a: pointer to be swapped.
+ *@b: pointer to be swapped.
+ * Return: Always 0
  */
-
-size_t partition(int *array, ssize_t low, ssize_t high, size_t size)
+void swap_bubble(int *a, int *b)
 {
-	int pivot = array[low], swap;
-	ssize_t i = low - 1, j = high + 1;
+	int temp;
 
-	while (1)
-	{
-		do {
-			i++;
-		} while (array[i] < pivot);
-		do {
-			j--;
-		} while (array[j] > pivot);
-		if (i >= j)
-			return (j);
-		swap = array[j];
-		array[j] = array[i];
-		array[i] = swap;
-		print_array(array, size);
-	}
+	temp = *a;
+	*a = *b;
+	*b = temp;
 }
 
 /**
- * quicksort - divides the array to perform the sorting
- * sort method
- * @array: array to be sorted
- * @low: first index
- * @high: last index
- * @size: array's size
- * Return: nothing
+ * quick_sort_hoare - sorts an array of integers with Hoare algorithm.
+ *@array: array to be sorted.
+ *@size: size of array.
+ * Return: void.
  */
-
-void quicksort(int *array, ssize_t low, ssize_t high, size_t size)
-{
-	ssize_t p;
-
-	if (low < high)
-	{
-		p = partition(array, low, high, size);
-		quicksort(array, low, p, size);
-		quicksort(array, p + 1, high, size);
-	}
-}
-
-/**
- * quick_sort_hoare - perform an incremental sorting using Hoare
- * sort method
- * @array: array to be sorted
- * @size: array's size
- * Return: nothing
- */
-
 void quick_sort_hoare(int *array, size_t size)
 {
-	if (array == NULL || size < 2)
-		return;
 
-	quicksort(array, 0, size - 1, size);
+	partition_sort_hoare(array, size, 0, size - 1);
+}
+
+/**
+ * partition_sort_hoare - function of partitios in Hoare algorithm.
+ *@array: given array to be sorted.
+ *@size: size of array to be sorted.
+ *@low: partition.
+ *@high: partition.
+ * Return: void.
+ */
+void partition_sort_hoare(int *array, size_t size, int low, int high)
+{
+	int part;
+
+	if (high - low > 0)
+	{
+		part = partition_hoare(array, size, low, high);
+		partition_sort_hoare(array, size, low, part - 1);
+		partition_sort_hoare(array, size, part, high);
+	}
+}
+
+/**
+ * partition_hoare - function with pivot for partition.
+ *@array: array to be sorted with Hoare algorithm.
+ *@size: size of array to be sorted.
+ *@low: low partition.
+ *@high: high partition.
+ * Return: Always 0
+ */
+int partition_hoare(int *array, size_t size, int low, int high)
+{
+	int pivot, high1, low1;
+
+	pivot = array[high];
+	for (high1 = low - 1, low1 = high + 1; high1 < low1;)
+	{
+		do {
+			high1++;
+		} while (array[high1] < pivot);
+		do {
+			low1--;
+		} while (array[low1] > pivot);
+
+		if (high1 < low1)
+		{
+			swap_bubble(array + high1, array + low1);
+			print_array(array, size);
+		}
+	}
+	return (high1);
 }
