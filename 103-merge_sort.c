@@ -1,84 +1,92 @@
 #include "sort.h"
-#include <stdlib.h>
-#include <stdio.h>
+
 /**
- * merge - merge and sort the arrays
- * @array: array to be sorted
- * @copy: auxiliar array
- * @start: array's first index
- * @mid: array's midle index
- * @end: array's last index
- * Return: nothing
+ * merge_sub - merge sorting algorithm function.
+ *@subarray: array split into sub array.
+ *@buffer: buffer of array.
+ *@lo: low partition.
+ *@mid: mid partition.
+ *@hi: high partition.
+ * Return: Always 0
  */
 
-void merge(int *array, int *copy, int start, int mid, int end)
+void merge_sub(int *subarray, int *buffer, size_t lo, size_t mid, size_t hi)
 {
-
-	int l1, l2, i = 0;
+	size_t low;
+	size_t midi;
+	size_t a = 0;
 
 	printf("Merging...\n[left]: ");
-	print_array(array + start, mid - start);
+	print_array(subarray + lo, mid - lo);
 
 	printf("[right]: ");
-	print_array(array + mid, end - mid);
+	print_array(subarray + mid, hi - mid);
 
-	for (l1 = start, l2 = mid; l1 < mid && l2 < end; i++)
-		if (array[l1] < array[l2])
-			copy[i] = array[l1++];
+	for (low = lo, midi = mid; low < mid && midi < hi; a++)
+	{
+		if (subarray[low] < subarray[midi])
+		{
+			buffer[a] = subarray[low++];
+		}
 		else
-			copy[i] = array[l2++];
-	while (l1 < mid)
-		copy[i++] = array[l1++];
-	while (l2 < end)
-		copy[i++] = array[l2++];
-	for (l1 = start, i = 0; l1 < end; l1++)
-		array[l1] = copy[i++];
-
+		{
+			buffer[a] = subarray[midi++];
+		}
+	}
+	for (; low < mid; low++)
+	{
+		buffer[a++] = subarray[low];
+	}
+	for (; midi < hi; midi++)
+	{
+		buffer[a++] = subarray[midi];
+	}
+	for (low = lo, a = 0; low < hi; low++)
+	{
+		subarray[low] = buffer[a++];
+	}
 	printf("[Done]: ");
-	print_array(array + start, end - start);
+	print_array(subarray + lo, hi - lo);
 }
 
 /**
- * array_divider - split the array
- * @array: array to be sorted
- * @copy: auxiliar array
- * @start: array's first index
- * @end: array's last index
- * Return: nothing
+ * merge_sort_call - calling the merge sort function.
+ *@subarray: subarray to be sorted.
+ *@buffer: buffer of array.
+ *@lo: low partition.
+ *@hi: high partition.
+ * Return: Always 0
  */
 
-void array_divider(int *array, int *copy, int start, int end)
+void merge_sort_call(int *subarray, int *buffer, size_t lo, size_t hi)
 {
-	i
-nt mid;
+	size_t mid;
 
-	if (end - start < 2)
-		return;
-
-	mid = start + (end - start) / 2;
-	array_divider(array, copy, start, mid);
-	array_divider(array, copy, mid, end);
-	merge(array, copy, start, mid, end);
+	if (hi - lo > 1)
+	{
+		mid = lo + (hi - lo) / 2;
+		merge_sort_call(subarray, buffer, lo, mid);
+		merge_sort_call(subarray, buffer, mid, hi);
+		merge_sub(subarray, buffer, lo, mid, hi);
+	}
 }
 
 /**
- * merge_sort - implementation of merge sort algorithm
- * @array: array to be sorted
- * @size: array's size
- * Return: nothing
+ * merge_sort - merge sort algorithm implementation
+ *@array: array to be sorted.
+ *@size: size of array to be sorted.
+ * Return: void.
  */
 
 void merge_sort(int *array, size_t size)
 {
-	int *copy;
+	int *buffer;
 
-	if (array == NULL || size < 2)
+	buffer = malloc(sizeof(int) * size);
+	if (buffer == NULL)
 		return;
 
-	copy = malloc(size * sizeof(int));
-	if (copy == NULL)
-		return;
+	merge_sort_call(array, buffer, 0, size);
 
-	array_divider(array, copy, 0, size);
-	free(copy);
+	free(buffer);
 }
